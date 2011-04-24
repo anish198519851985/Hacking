@@ -30,6 +30,7 @@ void call_(void){
 printf("bye bye \n");
 }
 
+//initial code
 #if 0
 char shellcode[] =
 	"\xeb\x2a\x5e\x89\x76\x08\xc6\x46\x07\x00\xc7\x46\x0c\x00\x00\x00"
