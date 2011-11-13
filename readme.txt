@@ -2,3 +2,4 @@
 2.send and recieve program is for sending data using signals.
 3.added linked list for push and pop using linked list along with creating/deleting linked list.
 4.Added queue implementation using arrays
+5.Pointer concept file is added
