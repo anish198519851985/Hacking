@@ -1,72 +1,105 @@
 #include <stdio.h>
+
 struct list_{
-int x;
-struct list_ *next;
+	int x;
+	struct list_ *next;
 };
 
 typedef struct list_ list;
-void add(list **head,int no);
+
+int add(list **head,int no);
 int delete(list **head,int position);
-int pop(list *head);
-void push(list **head,int number);
-void print(list *head);
+int print(list *head, int no);
+
+int search(list *first, list *end, int no_found)
+{
+	list *fast = first;
+	list *slow = first;
+	list *mid = first;	
+	list *b4mid;	
+	int found = 0;
+	printf("\nfirst = %d, End = %d", first->x, end->x);
+	while(first != end && first->next != end)
+	{
+		fast = fast->next->next;
+		b4mid = slow;
+		slow = slow->next;
+	}
+	printf("\nfirst = %d, Mid = %d,End = %d", first->x, slow->x, end->x);
+	mid = slow;
+	if(mid->x < no_found)
+	{
+		if(no_found < first->x || no_found > end->x )
+		{
+			printf("out of range\n");
+			found = 0;
+		} else
+			found += search(mid->next, fast, no_found);
+	} else if(mid->x > no_found){
+		if(no_found < first->x)
+		{
+			printf("out of range\n");
+			found = 0;
+		} else
+			found += search(first, b4mid, no_found);
+	} else if(mid->x == no_found){
+		printf("none found");
+		found = 1;
+	} else
+		found = 0;
+	return found;
+}
+
+int binary_search(list *local, int no_found)
+{
+	list *first = local;
+	list *end = local;
+	list *b4mid;
+	list *mid;
+	int found = 0;
+	while(end && end->next)
+	{
+		end = end->next->next;
+		b4mid = first;
+		first = first->next;
+	}
+	mid = first;
+	printf("\nmid = %d, End = %d", first->x, end->x);
+	if(no_found < first->x) 
+	{
+		if(no_found < local->x)
+			found = 0;
+		else
+			found = search(local, b4mid, no_found);
+	}
+	else if(no_found > first->x) {
+		if(no_found < local->x)
+			found = 0;
+		else
+			found = search(first->next, end, no_found);
+	}else if(first->x == no_found) {
+		printf("found the data\n");
+		found = 1;
+	}
+}
 
 main()
 {
 	list *head = NULL;
-	int number,no;
-	#if 0
-	printf("enter the number \n",number);
-	scanf("%d",&number);
-	printf("%d \n",number);
-		while(number--){
-			printf("push \n");
-			scanf("%d",&no);
-			push(&head,no);
-		}
-	pop(head);
-	#endif
-
-	printf("enter the number \n",number);
-	scanf("%d",&number);
-		while(number--){
-			printf("adding \n");
-			scanf("%d",&no);
-			add(&head,no);
-		}
-
-print(head);
-{
-	int x;
-	printf("which element you want to delete \n");
-	scanf("%d",&x);
-	x = delete(&head,x);
-	printf("deleted item %d \n",x);
-}
-	print(head);
+	int i = 0;int found;
+	while(i++ < 9)
+		add(&head, i);
+	print(head, 10);
+	printf("enter the search number \n");
+	scanf("%d", &i);
+	found = binary_search(head, i);
+	if(found)
+		printf("*******found*********\n");
+	else
+		printf("*******not found*****\n");
 }
 
-void push(list **head,int number)
-{
-	list *temp,*head_ref;
-	head_ref = *head;
-	temp = malloc(sizeof(struct list_));
-	temp->x = number;
-	temp->next = *head;
-	*head = temp;	
-}
-
-
-int pop(list *head)
-{
-	while(head != NULL)
-	{
-		printf("pop %d \n",head->x);	
-		head = head->next;
-	}
-}
-
-void add(list **head,int no)
+int add(list **head,int no)
 {
 	list *temp,*head_ref;
 	head_ref = *head;
@@ -82,11 +115,11 @@ void add(list **head,int no)
 		}	
 		head_ref->next = temp;
 	}	
+	return 0;
 }
 
 
 int delete(list **head,int position){
-	
 	list *temp,*head_ref = *head;
 	int data;
 
@@ -120,12 +153,12 @@ int delete(list **head,int position){
 	return data;
 }
 
-void print(list *head)
+int print(list *head, int no)
 {
-	printf("%s \n",__func__);
 	while(head != NULL)
 	{
 		printf("list no %d \n",head->x);	
 		head = head->next;
 	}
+	return 0;
 }
