@@ -11,6 +11,9 @@ int add(list **head,int no);
 int delete(list **head,int position);
 int print(list *head, int no);
 
+void print_back(list *head);
+
+int print(list *head, int no);
 int search(list *first, list *end, int no_found)
 {
 	list *fast = first;
@@ -89,7 +92,7 @@ main()
 	int i = 0;int found;
 	while(i++ < 9)
 		add(&head, i);
-	print(head, 10);
+	print_back(head);
 	printf("enter the search number \n");
 	scanf("%d", &i);
 	found = binary_search(head, i);
@@ -151,6 +154,14 @@ int delete(list **head,int position){
 		}
 	}
 	return data;
+}
+
+void print_back(list *head)
+{
+	if(!head)
+		return;
+	print_back(head->next);
+	printf("list data%d\n", head->x);
 }
 
 int print(list *head, int no)
