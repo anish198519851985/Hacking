@@ -1,7 +1,7 @@
 int main()
 {
 	int i, j;
-	int a[] = {1, 12, 5, 4, 3, 6, 73, 0};
+	int a[] = {1, 12, 5, 6, 3, 7, 73, 0};
 	int LS[100] = {0};
 	int n = sizeof(a)/sizeof(a[0]);
 	int largest = 0;
@@ -23,7 +23,7 @@ int main()
 			if(a[i] > a[j] && LS[i] < (LS[j] + 1)) {
 				LS[i] = LS[j]+1;
 				printf("j %d\n", j);
-				b[j] = j;
+				b[i] = j;
 			}
 		}
 	}
