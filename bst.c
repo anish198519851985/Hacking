@@ -1,173 +1,293 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
+#include<stdio.h>
+#include<stdlib.h>
 
-/* A binary tree node has data, pointer to left child
-   and a pointer to right child */
-struct node
+typedef struct treeNode
 {
 	int data;
-	struct node* left;
-	struct node* right;
-};
+	struct treeNode *left;
+	struct treeNode *right;
+	int visited;
 
-struct stack{
-	struct node *bst_node;
-	struct stack *next;
-};
-typedef struct stack stack;
-stack *front, *rear;
+}treeNode;
 
-void push(struct node *bst_node)
+treeNode* FindMin(treeNode *node)
 {
-	printf("%s %d\n", __func__, bst_node->data);
-	stack *node = malloc(sizeof(*node));
-	node->next = NULL;
-	node->bst_node = bst_node;
-
-	if (front == NULL) {
-		front = node;
-	} else {
-		stack *node = malloc(sizeof(*node));
-		node->next = front;
-		node->bst_node = bst_node;
-		front = node;
-	}
-}
-
-struct node *pop(void)
-{
-	if(front == NULL) {
-		printf("nothing here\n");
+	if(node==NULL)
+	{
+		/* There is no element in the tree */
 		return NULL;
-	} else {
-		stack *temp = front;
-		front = front->next;
-		return temp->bst_node;
 	}
+	if(node->left) {/* Go to the left sub tree to find the min element */
+		printf("%d ,", node->left->data);
+		return FindMin(node->left);
+	} else 
+		return node;
 }
 
-/* Helper function that allocates a new node with the
-   given data and NULL left and right pointers. */
-struct node* newNode(int data)
+treeNode* FindMax(treeNode *node)
 {
-	struct node* node = (struct node*)
-		malloc(sizeof(struct node));
-	node->data = data;
-	node->left = NULL;
-	node->right = NULL;
-
-	return(node);
+	if(node==NULL)
+	{
+		/* There is no element in the tree */
+		return NULL;
+	}
+	if(node->right) /* Go to the left sub tree to find the min element */
+		FindMax(node->right);
+	else 
+		return node;
 }
 
-void print_bst(struct node *new) 
+treeNode * Insert(treeNode *node,int data)
 {
-	if(new == NULL)
+	if(node==NULL)
+	{
+		treeNode *temp;
+		temp = (treeNode *)malloc(sizeof(treeNode));
+		temp -> data = data;
+		temp -> left = temp -> right = NULL;
+		return temp;
+	}
+
+	if(data >(node->data))
+	{
+		node->right = Insert(node->right,data);
+	}
+	else if(data < (node->data))
+	{
+		node->left = Insert(node->left,data);
+	}
+	/* Else there is nothing to do as the data is already in the tree. */
+	return node;
+
+}
+
+treeNode * Delete(treeNode *node, int data)
+{
+	treeNode *temp;
+	if(node==NULL)
+	{
+		printf("Element Not Found");
+	}
+	else if(data < node->data)
+	{
+		node->left = Delete(node->left, data);
+	}
+	else if(data > node->data)
+	{
+		node->right = Delete(node->right, data);
+	}
+	else
+	{
+		/* Now We can delete this node and replace with either minimum element 
+		   in the right sub tree or maximum element in the left subtree */
+		if(node->right && node->left)
+		{
+			/* Here we will replace with minimum element in the right sub tree */
+			temp = FindMin(node->right);
+			node -> data = temp->data; 
+			/* As we replaced it with some other node, we have to delete that node */
+			node -> right = Delete(node->right,temp->data);
+		}
+		else
+		{
+			/* If there is only one or zero children then we can directly 
+			   remove it from the tree and connect its parent to its child */
+			temp = node;
+			if(node->left == NULL)
+				node = node->right;
+			else if(node->right == NULL)
+				node = node->left;
+			free(temp); /* temp is longer required */ 
+		}
+	}
+	return node;
+
+}
+
+treeNode * Find(treeNode *node, int data)
+{
+	if(node==NULL)
+		return NULL;
+	if(data > node->data)
+		return Find(node->right,data);
+	else if(data < node->data)
+		return Find(node->left,data);
+	else
+		return node;
+}
+
+void PrintInorder(treeNode *node)
+{
+	if(node==NULL)
 		return;
-	print_bst(new->left);
-	printf("%d\n", new->data);
-	print_bst(new->right);
+	PrintInorder(node->left);
+	printf("%d ",node->data);
+	PrintInorder(node->right);
 }
 
-struct node *minValue(struct node *new)
+void PrintPreorder(treeNode *node)
 {
-	struct node *prev = new;
-	while(new != NULL && new->left != NULL) {
-		prev = new->left;
-		new = new->left;
+	if(node==NULL)
+		return;
+	printf("%d ",node->data);
+	PrintPreorder(node->left);
+	PrintPreorder(node->right);
+}
+
+void PrintPostorder(treeNode *node)
+{
+	if(node==NULL)
+		return;
+	PrintPostorder(node->left);
+	PrintPostorder(node->right);
+	printf("%d ",node->data);
+}
+
+#if 1
+#define Q_SIZE 10
+struct queue *head_q;
+struct queue *tail;
+
+struct queue{
+	struct queue *next;
+	treeNode *node;
+};
+typedef struct queue queue;
+queue *q = NULL;
+
+void enq(treeNode *node)
+{
+	if(head_q == NULL || tail == NULL) { /* q is empty */
+		struct queue *q = malloc(sizeof(struct queue));
+		q->next = NULL;
+		q->node = node;
+		head_q = q;
+		tail = q;
+	} else {
+		struct queue *temp = head_q;
+		while(temp->next != NULL) {
+			temp = temp->next;
+		}
+		struct queue *q = malloc(sizeof(struct queue));
+		q->next = NULL;
+		q->node = node;
+		temp->next = q;
+		head_q = q;
 	}
-	return prev;
 }
 
-struct node *maxValue(struct node *new)
+treeNode * deq()
 {
-	struct node *prev = new;
-	while(new != NULL && new->right != NULL) {
-		prev = new->right;
-		new = new->right;
-	}
-	return prev;
+	struct queue *temp = tail;
+	tail = tail->next;
+	return temp->node;
 }
 
-#if 0
-int isBST(struct node *new)
+int q_empty()
 {
-	if(new == NULL)
+	if(head_q == NULL || tail == NULL)
 		return 1;
-	if(new->left != NULL && (maxValue(new->left))->data > new->data) {
+	else
 		return 0;
-	}
+}
 
-	if(new->right != NULL && (minValue(new->right))->data < new->data) {
-		return 0;
+/*DFS uses stack*/
+void bfs(treeNode *node)
+{
+	enq(node);
+	while(!q_empty()) { /*check if the stack is empty*/
+		/* pop the stack and mark it visited*/
+		node = deq();
+		node->visited = 1;
+		printf("%d\n", node->data);
+		/*check if it has any left or right node*/
+		/*if yes then push it on the stack */
+		if(node->left != NULL && node->left->visited != 1) {
+			enq(node->left);
+		}
+		if(node->right != NULL && node->right->visited != 1) {
+			enq(node->right);
+		}
+		/*if no then just let the loop continue */
 	}
-	printf("helo\n");
-	if(!isBST(new->left) || !isBST(new->right))
-		return 0;
-	return 1;
 }
 #endif
 
+struct stack{
+	struct stack *next;
+	treeNode *node;
+};
+typedef struct stack stack;
+stack *head = NULL;
 
-
-int isBST(struct node* root)
+treeNode *pop()
 {
-	static struct node *prev = NULL;
+	stack *temp = head;
+	head = head->next;
+	return temp->node;
+}
 
-	// traverse the tree in inorder fashion and keep track of prev node
-	if (root)
-	{
-		if (!isBST(root->left))
-			return 0;
 
-		// Allows only distinct valued nodes 
-		if (prev != NULL && root->data <= prev->data) {
-			return 0;
-		}
-
-		prev = root;
-		return isBST(root->right);
+void push(treeNode *node)
+{
+	if(head == NULL) {
+		stack *q = malloc(sizeof(struct stack));
+		q->next = NULL;
+		q->node = node;
+		head = q;
+		return;
 	}
-
-	return 1;
+	stack *q = malloc(sizeof(stack));
+	q->next = head;
+	q->node = node;
+	head = q;
 }
 
-void dfs(struct node *root)
+int stack_empty()
 {
-	struct node *temp;
-	push(root);
-	do {
-		temp = pop();
-		if(temp == NULL) {
-			break;
-		} else {
-			printf("popped is %d\n", temp->data);
-			if(temp->right != NULL)
-				push(temp->right);	
-			if(temp->left != NULL)
-				push(temp->left);	
-		}
-	}while(temp != NULL);
+	if(head == NULL)
+		return 1;
+	else
+		return 0;
 }
 
-/* Driver program to test above functions*/
+/*DFS uses stack*/
+void dfs(treeNode *node)
+{
+	push(node);
+	while(!stack_empty()) { /*check if the stack is empty*/
+		/* pop the stack and mark it visited*/
+		node = pop();
+		node->visited = 1;
+		printf("%d\n", node->data);
+		/*check if it has any left or right node*/
+		/*if yes then push it on the stack */
+		if(node->right != NULL && node->right->visited != 1) {
+			push(node->right);
+		}
+		if(node->left != NULL && node->left->visited != 1) {
+			push(node->left);
+		}
+		/*if no then just let the loop continue */
+	}
+}
+
 int main()
 {
-	front = NULL;
-	rear = NULL;
-	struct node *kk;
-	struct node *temp = calloc(1, sizeof(*temp));
-	struct node *node = newNode(40);
-	node->left        = newNode(20);
-	node->right        = newNode(60);
-	node->left->left  = newNode(10);
-	node->left->right = newNode(30);
-	node->right->right = newNode(70);
+	treeNode *root = NULL;
+	treeNode *temp;
+	queue *head_q, *tail;
+	head_q = tail = NULL; /*empty queue */
 
-	print_bst(node);
-	//printf("aa %d\n", maxValue(node)->data);
-	//printf("aa %d\n", minValue(node)->data);
-	dfs(node);
-	getchar();
-	return 0;
+	root = Insert(root, 13);
+	root = Insert(root, 20);
+	root = Insert(root, 10);
+	root = Insert(root, 21);
+	root = Insert(root, 22);
+	root = Insert(root, 11);
+	root = Insert(root, 12);
+	root = Insert(root, 8);
+	PrintInorder(root);
+	printf("\n");
+	bfs(root);
 }
