@@ -33,11 +33,8 @@ int q_s(int a[], int left, int right, int k)
 		return a[left];
 	if(left < right) {
 		int i;
-		printf("left %d right %d\n", left, right);
 		int pivot = partition(a, left, right);
-		printf("pivot %d\n", pivot);
 		int newPivotDistance = pivot - left + 1;
-		printf("k is %d pivot distance %d\n", k, newPivotDistance);
 		if(newPivotDistance == k) return a[pivot];
 		if(newPivotDistance > k)
 			q_s(a, left, pivot-1, k);
