@@ -28,4 +28,5 @@ int main()
 	char str[50]={'\0'};
 	char num[10]="1123";
 	generate_alphabets(num,str,0,0);
+	return 0;
 }
