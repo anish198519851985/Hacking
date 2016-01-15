@@ -1,4 +1,3 @@
-
 class queue:
 	def __init__(self, size):
 		#make sure size is power of 2
@@ -12,19 +11,22 @@ class queue:
 		self.write_pointer = 0
 		self.size_mask = size - 1
 	
-	def insert_queue(self, data):
+	def enqueue(self, data):
 		if ((self.write_pointer+1) & self.size_mask) == self.read_pointer:
 			print("queue is full")
-			return
+			return "sentinel"
 		self.queue[self.write_pointer] = data
 		self.write_pointer += 1
 		self.write_pointer &= self.size_mask
 	
-	def consume_data(self):
+	def dequeue(self):
 		if self.read_pointer == self.write_pointer:
 			print("queue is empty")
-			return
+			return "sentinel"
 		removed_data = self.queue[self.read_pointer]
 		self.read_pointer += 1
 		self.read_pointer &= (self.size-1)		
 		return removed_data
+		
+	def isempty(self):
+		return self.read_pointer == self.write_pointer
