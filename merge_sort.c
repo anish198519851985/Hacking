@@ -1,119 +1,62 @@
-#include <stdlib.h>
 #include <stdio.h>
 
-typedef struct link link;
+int inversion_count;
 
-struct link {
-	int value;
-	link *next;
-};
-void print(link *head)
+void merge(int *a, int start, int mid, int end)
 {
-        printf("****************************");
-        while(head != NULL)
-        {
-                printf("\n%d\n",head->value);
-                head = head->next;
+        int *c = malloc(sizeof(int)*(end-start+1));
+        int i, j=0, k=0, left_track=start, right_track=mid+1, left_len, right_len;
+        int left = mid-start+1, right=end-(mid+1)+1;
+        while (left  && right) {
+                while (left && a[left_track] <= a[right_track]) {
+                        inversion_count++;
+                        c[k++] = a[left_track++];
+                        left--;
+                }
+                if (!left)
+                        break;
+                while (right && a[left_track] >= a[right_track]) {
+                        inversion_count++;
+                        c[k++] = a[right_track++];
+                        right--;
+                }
         }
-        printf("****************************");
+
+        while (left) {
+                c[k++] = a[left_track++];
+                left--;
+        }
+        while (right) {
+                c[k++] = a[right_track++];
+                right--;
+        }
+        for (i=start;i<=end;i++) {
+                a[i] = c[j++];
+        }
+        free(c);
 }
 
-
-link *cons(int value, link *next) {
-	struct link *l = malloc(sizeof *l);
-	if (l) {
-		l->value = value;
-		l->next = next;
-	}
-	return l;
+void merge_sort(int *a, int start, int end) {
+        if (start < end) {
+                int pivot = (start + end)/2;
+                merge_sort(a, start, pivot);
+                merge_sort(a, pivot+1, end);
+                merge(a, start, pivot, end);
+        }
 }
 
-link *recons(link *element, int value, link *next) {
-	element->value = value;
-	element->next = next;
-	return element;
-}
+int main(void) {
+        int a[] = {2, 4, 1, 3, 5}, i;
 
-link *append(link ***tail, link *element) {
-	**tail = element;
-	element->next = NULL;
-	*tail = &element->next;
-	return element;
-}
-
-link *pop(link **head) {
-	struct link *element = *head;
-	if (element) {
-		*head = element->next;
-		element->next = NULL;
-	}
-	return element;
-
-}
-
-link *merge(link *a, link *b) {
-#if 0
-	printf("\nadding to a\n");
-	print(a);
-	printf("\nadding to b\n");
-	print(b);
-#endif
-	if (!a) {
-		return b;
-	} else if (!b) {
-		return a;
-	} else if (a->value < b->value) {
-		return recons(a, a->value, merge(a->next, b));
-	} else {
-		return recons(b, b->value, merge(b->next, a));
-	}
-}
-
-link *merge_sort(link *list) {
-	if (!list || !list->next) {
-		return list;
-	} else {
-		link *even = NULL;
-		link *odd = NULL;
-		link **even_tail = &even;
-		link **odd_tail = &odd;
-		link *element;
-
-		while (list) {
-			if (element = pop(&list)) {
-				append(&even_tail, element);
-			}
-			if (element = pop(&list)) {
-				append(&odd_tail, element);
-			}
-		}
-                link *even1 = merge_sort(even);
-                link *odd1 = merge_sort(odd);
-#if 1
-		print(odd1);
-		printf("\n````median\n");
-		print(even1);
-#endif
-		return merge(even1, odd1);
-	}
-}
-
-int main() {
-	link *input = NULL;
-	link **input_tail = &input;
-	char buffer[512];
-	int i = 0;
-		append(&input_tail, cons(1, NULL));
-		append(&input_tail, cons(2, NULL));
-		append(&input_tail, cons(3, NULL));
-		append(&input_tail, cons(4, NULL));
-		append(&input_tail, cons(0, NULL));
-
-	link *sorted = merge_sort(input);
-
-	printf("---\n");
-
-	while (sorted) {
-		printf("%d\n", pop(&sorted)->value);
-	}
+        for (i=0;i<sizeof(a)/sizeof(a[0]);i++) {
+                printf("%d ", a[i]);
+        }
+        printf("\n");
+        merge_sort(a, 0, sizeof(a)/sizeof(a[0])-1);
+        for (i=0;i<sizeof(a)/sizeof(a[0]);i++) {
+                printf("%d ", a[i]);
+        }
+        printf("\n");
+        printf("inversion_count %d \n", inversion_count);
+        return 0;
 }
