@@ -5,8 +5,8 @@ int inversion_count;
 void merge(int *a, int start, int mid, int end)
 {
         int *c = malloc(sizeof(int)*(end-start+1));
-        int i, j=0, k=0, left_track=start, right_track=mid+1, left_len, right_len;
-        int left = mid-start+1, right=end-(mid+1)+1;
+        int i, j=0, k=0, left_track=start, right_track=mid+1, left = mid-start+1, right=end-(mid+1)+1;
+        
         while (left  && right) {
                 while (left && a[left_track] <= a[right_track]) {
                         inversion_count++;
