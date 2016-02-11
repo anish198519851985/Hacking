@@ -9,14 +9,13 @@ void merge(int *a, int start, int mid, int end)
         
         while (left  && right) {
                 while (left && a[left_track] <= a[right_track]) {
-                        inversion_count++;
                         c[k++] = a[left_track++];
                         left--;
                 }
                 if (!left)
                         break;
                 while (right && a[left_track] >= a[right_track]) {
-                        inversion_count++;
+                        inversion_count += left;
                         c[k++] = a[right_track++];
                         right--;
                 }
