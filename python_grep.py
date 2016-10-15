@@ -4,9 +4,11 @@ import re
 import itertools
 
 def get_files(path, pattern):
-  for (dirpath, dirnames, filenames) in os.walk(path):
+  for (dirpath, dirnames, filenames) in os.walk(path, followlinks=False):
     for filename in filenames:
       if filename.endswith(pattern):
+        if os.path.islink(os.path.join(dirpath, filename)):
+          continue
         yield os.path.join(dirpath, filename)
 
 def worker_search_fn(arg):
