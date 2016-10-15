@@ -1,5 +1,7 @@
 import os, sys, getopt
+import multiprocessing as mp
 import re
+import itertools
 
 def get_files(path, pattern):
   for (dirpath, dirnames, filenames) in os.walk(path):
@@ -7,12 +9,13 @@ def get_files(path, pattern):
       if filename.endswith(pattern):
         yield os.path.join(dirpath, filename)
 
-def parse_files(file, pattern, s_pattern_flags):
-  regex = re.compile(pattern, s_pattern_flags)
-  with open(file, 'r') as outfile:
-      match = regex.search(outfile.read())
-      if match:
-        print(file + " " +":"+ match.group())
+def worker_search_fn(arg):
+  fname, regex = arg
+  with open(fname, 'rt') as f:
+    match = regex.search(f.read())
+    if match:
+      print(fname + " " +":"+ match.group())
+      return
 
 def main(argv):
   path, f_pattern, s_pattern = '', '', ''
@@ -35,9 +38,9 @@ def main(argv):
      elif opt in ("-S", "--string_flags"):
         s_pattern_flags = arg
 
+  regex = re.compile(s_pattern, getattr(re, s_pattern_flags))
   files = get_files(path, tuple(f_pattern))
-  for file in files:
-    parse_files(file, s_pattern, getattr(re, s_pattern_flags))
+  mp.Pool().map(worker_search_fn, itertools.izip(files, itertools.repeat(regex)))
 
 if __name__ == "__main__":
   main(sys.argv[1:])
