@@ -1,0 +1,21 @@
+import re
+import tempfile
+import fileinput
+import sys
+
+with open(sys.argv[1], "r") as ins:
+  print("call it:python test.py test.txt '\b(\d{1,2},)\s\b(\w+)\s\b(\w+)(.*)' '\1 \3 \2\4'")
+  t = tempfile.NamedTemporaryFile(mode="r+")
+  regex = re.compile(sys.argv[2])
+  for line in ins:
+    line_replace = re.sub(sys.argv[2], sys.argv[3], line)
+    print(line)
+    print(line_replace)
+    t.write(line_replace)
+  t.seek(0)
+  ins.close()
+with open(sys.argv[1], "w") as ins:
+  for line in t:
+    ins.write(line)
+    print(line)
+  t.close()
